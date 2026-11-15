@@ -11,14 +11,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: kho447520/android_kernel_samsung_exynos7885
-          ref: master
+          ref: Hi
           fetch-depth: 1
 
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
         with:
           kernel-url: https://github.com/kho447520/android_kernel_samsung_exynos7885
-          kernel-branch: master
+          kernel-branch: Hi
           config: a10.config
           arch: arm64
           android-version: 17
