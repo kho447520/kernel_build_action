@@ -9,29 +9,35 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - name: Checkout kernel source
+      - name: Checkout Source
         uses: actions/checkout@v4
         with:
           repository: kho447520/android_kernel_samsung_exynos7885
           ref: Hi
-          path: kernel
           fetch-depth: 1
 
-      - name: Setup config for this kernel
-        working-directory: kernel
+      - name: Force Config and Build
         run: |
-          make ARCH=arm64 exynos7885_defconfig
-          scripts/kconfig/merge_config.sh -m .config arch/arm64/configs/a10.config
+          # 1. Tìm và thay thế dòng TZDEV_IWI_EVENT trong file a10.config
+          # Xóa dòng cũ (nếu có) và thêm dòng mới với giá trị số cụ thể
+          sed -i '/TZDEV_IWI_EVENT/d' arch/arm64/configs/a10.config
+          echo "CONFIG_TZDEV_IWI_EVENT=0" >> arch/arm64/configs/a10.config
+          
+          # 2. Tạo file .config từ a10.config
+          make ARCH=arm64 a10.config
+          
+          # 3. Tự động chốt toàn bộ cấu hình còn lại (không hỏi han gì cả)
           make ARCH=arm64 olddefconfig
+          
+          # 4. Bắt đầu build trực tiếp (không dùng action nữa để tránh nó gọi lại config)
+          export ARCH=arm64
+          export SUBARCH=arm64
+          # Bạn cần đảm bảo toolchain đã có sẵn trong môi trường GitHub Actions
+          # Nếu thiếu, hãy dùng action dabao1955 nhưng bỏ qua bước config của nó
+          make -j$(nproc) Image
 
-      - name: Build Kernel
-        uses: dabao1955/kernel_build_action@main
+      - name: Upload Image
+        uses: actions/upload-artifact@v4
         with:
-          kernel-url: ./kernel/
-          config: a10.config
-          arch: arm64
-          android-version: 12
-          aosp-clang: true
-          aosp-clang-version: r383902
-          aosp-gcc: true
-          anykernel3: false
+          name: Kernel-Image
+          path: arch/arm64/boot/Image
