@@ -16,23 +16,24 @@ jobs:
           ref: Hi
           fetch-depth: 1
 
-      - name: Fix Config and Auto-accept defaults
+      - name: Setup Config Automatically
         run: |
-          # 1. Ghi đè giá trị mặc định cho TZDEV_IWI_EVENT (thường là 0 hoặc một số cụ thể)
-          # Dùng sed để tìm và thay thế nếu dòng đó đã tồn tại, hoặc thêm mới
-          sed -i '/TZDEV_IWI_EVENT/d' arch/arm64/configs/a10.config
-          echo "CONFIG_TZDEV_IWI_EVENT=0" >> arch/arm64/configs/a10.config
+          # Sử dụng file defconfig gốc của dòng máy (ví dụ exynos7885_defconfig) làm nền
+          # Nếu trong thư mục arch/arm64/configs/ có tên khác, bạn hãy sửa lại cho đúng (ví dụ: exynos7885-a10_defconfig)
+          make ARCH=arm64 exynos7885_defconfig 
           
-          # 2. Tự động tạo file .config từ a10.config và chọn mặc định cho mọi thứ khác
-          make ARCH=arm64 a10.config
+          # Áp file a10.config của bạn vào
+          scripts/kconfig/merge_config.sh -m .config arch/arm64/configs/a10.config
+          
+          # Tự động chốt toàn bộ cấu hình mặc định, KHÔNG hỏi bất kỳ câu nào
           make ARCH=arm64 olddefconfig
-          
+
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
         with:
           kernel-url: https://github.com/kho447520/android_kernel_samsung_exynos7885
           kernel-branch: Hi
-          config: a10.config  # Action sẽ dùng file config đã được sửa ở bước trên
+          # Bỏ tham số config đi, vì chúng ta đã tự cấu hình xong ở bước trên
           arch: arm64
           android-version: 12
           aosp-clang: true
