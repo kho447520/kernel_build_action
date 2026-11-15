@@ -23,6 +23,6 @@ jobs:
           arch: arm64
           android-version: 17
           aosp-clang: true
-          aosp-clang-version: r522817
+          aosp-clang-version: r383902
           aosp-gcc: true
           anykernel3: false
