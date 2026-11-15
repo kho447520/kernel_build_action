@@ -11,7 +11,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: kho447520/android_kernel_samsung_exynos7885
-          ref: main
+          ref: master
+          fetch-depth: 1
 
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
@@ -20,12 +21,8 @@ jobs:
           kernel-branch: master
           config: a10.config
           arch: arm64
-          
-          # Tham số hướng tới môi trường Android 17
           android-version: 17
           aosp-clang: true
-          aosp-clang-version: r522817   # Clang mới hơn, phù hợp với các dòng kernel cao
-          aosp-gcc: false               # Android 17 ưu tiên Clang thuần
-          
-          # Tắt AnyKernel3 để tránh lỗi đóng gói do khác biệt kiến trúc
+          aosp-clang-version: r522817
+          aosp-gcc: false
           anykernel3: false
