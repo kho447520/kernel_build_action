@@ -1,0 +1,31 @@
+name: Build Kernel Android 17
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          repository: kho447520/android_kernel_samsung_exynos7885
+          ref: main
+
+      - name: Build Kernel
+        uses: dabao1955/kernel_build_action@main
+        with:
+          kernel-url: https://github.com/kho447520/android_kernel_samsung_exynos7885
+          kernel-branch: main
+          config: a10.config
+          arch: arm64
+          
+          # Tham số hướng tới môi trường Android 17
+          android-version: 17
+          aosp-clang: true
+          aosp-clang-version: r522817   # Clang mới hơn, phù hợp với các dòng kernel cao
+          aosp-gcc: false               # Android 17 ưu tiên Clang thuần
+          
+          # Tắt AnyKernel3 để tránh lỗi đóng gói do khác biệt kiến trúc
+          anykernel3: false
