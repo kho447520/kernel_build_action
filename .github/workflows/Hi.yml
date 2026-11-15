@@ -6,7 +6,26 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    timeout-minutes: 60
+
     steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          repository: kho447520/android_kernel_samsung_exynos7885
+          ref: Hi
+          fetch-depth: 1
+
+      - name: Force config values (Prevent Y/N prompt)
+        run: |
+          # Đảm bảo cấu hình TZDEV được bật cứng thành Y
+          # (Thêm vào cuối file config để ghi đè)
+          echo "CONFIG_TZDEV_IWI_EVENT=y" >> a10.config
+          echo "CONFIG_TZDEV=y" >> a10.config
+          
+          # Tự động chạy olddefconfig để chốt cấu hình
+          make ARCH=arm64 a10.config olddefconfig
+
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
         with:
