@@ -16,22 +16,23 @@ jobs:
           ref: Hi
           fetch-depth: 1
 
-      - name: Force config values (Prevent Y/N prompt)
+      - name: Fix Config and Auto-accept defaults
         run: |
-          # Đảm bảo cấu hình TZDEV được bật cứng thành Y
-          # (Thêm vào cuối file config để ghi đè)
-          echo "CONFIG_TZDEV_IWI_EVENT=y" >> a10.config
-          echo "CONFIG_TZDEV=y" >> a10.config
+          # 1. Ghi đè giá trị mặc định cho TZDEV_IWI_EVENT (thường là 0 hoặc một số cụ thể)
+          # Dùng sed để tìm và thay thế nếu dòng đó đã tồn tại, hoặc thêm mới
+          sed -i '/TZDEV_IWI_EVENT/d' arch/arm64/configs/a10.config
+          echo "CONFIG_TZDEV_IWI_EVENT=0" >> arch/arm64/configs/a10.config
           
-          # Tự động chạy olddefconfig để chốt cấu hình
-          make ARCH=arm64 a10.config olddefconfig
-
+          # 2. Tự động tạo file .config từ a10.config và chọn mặc định cho mọi thứ khác
+          make ARCH=arm64 a10_defconfig
+          make ARCH=arm64 olddefconfig
+          
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
         with:
           kernel-url: https://github.com/kho447520/android_kernel_samsung_exynos7885
           kernel-branch: Hi
-          config: a10.config
+          config: a10.config  # Action sẽ dùng file config đã được sửa ở bước trên
           arch: arm64
           android-version: 12
           aosp-clang: true
