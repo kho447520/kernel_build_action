@@ -24,7 +24,7 @@ jobs:
           echo "CONFIG_TZDEV_IWI_EVENT=0" >> arch/arm64/configs/a10.config
           
           # 2. Tự động tạo file .config từ a10.config và chọn mặc định cho mọi thứ khác
-          make ARCH=arm64 a10_defconfig
+          make ARCH=arm64 a10.config
           make ARCH=arm64 olddefconfig
           
       - name: Build Kernel
