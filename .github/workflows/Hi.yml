@@ -17,7 +17,7 @@ jobs:
         uses: dabao1955/kernel_build_action@main
         with:
           kernel-url: https://github.com/kho447520/android_kernel_samsung_exynos7885
-          kernel-branch: main
+          kernel-branch: master
           config: a10.config
           arch: arm64
           
