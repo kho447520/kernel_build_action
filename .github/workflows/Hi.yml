@@ -9,31 +9,26 @@ jobs:
     timeout-minutes: 60
 
     steps:
-      - name: Checkout Source
+      - name: Checkout kernel source
         uses: actions/checkout@v4
         with:
           repository: kho447520/android_kernel_samsung_exynos7885
           ref: Hi
+          path: kernel
           fetch-depth: 1
 
-      - name: Setup Config Automatically
+      - name: Setup config for this kernel
+        working-directory: kernel
         run: |
-          # Sử dụng file defconfig gốc của dòng máy (ví dụ exynos7885_defconfig) làm nền
-          # Nếu trong thư mục arch/arm64/configs/ có tên khác, bạn hãy sửa lại cho đúng (ví dụ: exynos7885-a10_defconfig)
-          make ARCH=arm64 exynos7885_defconfig 
-          
-          # Áp file a10.config của bạn vào
+          make ARCH=arm64 exynos7885_defconfig
           scripts/kconfig/merge_config.sh -m .config arch/arm64/configs/a10.config
-          
-          # Tự động chốt toàn bộ cấu hình mặc định, KHÔNG hỏi bất kỳ câu nào
           make ARCH=arm64 olddefconfig
 
       - name: Build Kernel
         uses: dabao1955/kernel_build_action@main
         with:
-          kernel-url: https://github.com/kho447520/android_kernel_samsung_exynos7885
-          kernel-branch: Hi
-          # Bỏ tham số config đi, vì chúng ta đã tự cấu hình xong ở bước trên
+          kernel-url: ./kernel/
+          config: a10.config
           arch: arm64
           android-version: 12
           aosp-clang: true
